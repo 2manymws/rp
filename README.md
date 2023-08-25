@@ -1,4 +1,4 @@
-# rp
+# rp ![Coverage](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/rp/coverage.svg) ![Code to Test Ratio](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/rp/ratio.svg) ![Test Execution Time](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/rp/time.svg)
 
 `rp` is a reverse proxy package for multiple domains and multiple upstreams.
 
