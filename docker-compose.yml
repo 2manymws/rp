@@ -1,0 +1,13 @@
+services:
+  echo_server:
+    image: nginx
+    ports:
+      - 18080:80
+    volumes:
+      - ./testdata/nginx_echo.conf:/etc/nginx/nginx.conf
+  reverse_proxy_server:
+    image: nginx
+    ports:
+      - 18081:80
+    volumes:
+      - ./testdata/nginx_reverse.conf:/etc/nginx/nginx.conf
