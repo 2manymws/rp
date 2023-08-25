@@ -11,13 +11,19 @@ import (
 
 const errorKey = "X-Proxy-Error"
 
+// Relayer is the interface of the implementation that determines the behavior of the reverse proxy
 type Relayer interface {
+	// GetUpstream returns the upstream URL for the given request.
 	GetUpstream(*http.Request) (*url.URL, error)
+	// Rewrite rewrites the request before sending it to the upstream.
 	Rewrite(*httputil.ProxyRequest) error
+	// GetCertificate returns the TLS certificate for the given client hello info.
 	GetCertificate(*tls.ClientHelloInfo) (*tls.Certificate, error)
+	// RoundTrip performs the round trip of the request.
 	RoundTrip(r *http.Request) (*http.Response, error)
 }
 
+// NewRouter returns a new reverse proxy router.
 func NewRouter(r Relayer) http.Handler {
 	return &httputil.ReverseProxy{
 		Rewrite: func(pr *httputil.ProxyRequest) {
@@ -37,6 +43,7 @@ func NewRouter(r Relayer) http.Handler {
 	}
 }
 
+// NewServer returns a new reverse proxy server.
 func NewServer(addr string, r Relayer) *http.Server {
 	rp := NewRouter(r)
 	return &http.Server{
@@ -45,6 +52,7 @@ func NewServer(addr string, r Relayer) *http.Server {
 	}
 }
 
+// NewTLSServer returns a new reverse proxy TLS server.
 func NewTLSServer(addr string, r Relayer) *http.Server {
 	rp := NewRouter(r)
 	tc := new(tls.Config)
