@@ -33,7 +33,6 @@ func NewRouter(r Relayer) http.Handler {
 				return
 			}
 			pr.SetURL(u)
-			pr.SetXForwarded()
 			if err := r.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return

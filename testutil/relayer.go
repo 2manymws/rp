@@ -28,6 +28,7 @@ func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 }
 
 func (r *Relayer) Rewrite(pr *httputil.ProxyRequest) error {
+	pr.SetXForwarded()
 	return nil
 }
 
