@@ -17,6 +17,7 @@ type Relayer interface {
 	// DO NOT modify the request in this method.
 	GetUpstream(*http.Request) (*url.URL, error)
 	// Rewrite rewrites the request before sending it to the upstream.
+	// For example, you can set `X-Forwarded-*` header here using [httputil.ProxyRequest.SetXForwarded](https://pkg.go.dev/net/http/httputil#ProxyRequest.SetXForwarded)
 	Rewrite(*httputil.ProxyRequest) error
 	// GetCertificate returns the TLS certificate for the given client hello info.
 	GetCertificate(*tls.ClientHelloInfo) (*tls.Certificate, error)
