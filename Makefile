@@ -44,21 +44,7 @@ prerelease_for_tagpr: depsdev
 release:
 	git push origin main --tag
 
-performance_test:
-	docker compose rm -f | true
-	docker compose up -d
-	cd testdata && go build -o rp performance.go && ./rp &
-	while ! curl -s http://127.0.0.1:18081/ | grep -q OK; do sleep 1; done
-	while ! curl -s http://127.0.0.1:18082/ | grep -q OK; do sleep 1; done
-	@echo "====================================="
-	@echo "start performance test with nginx"
-	@echo "====================================="
-	@ab -n 10000 -c 10 http://127.0.0.1:18081/
-	@sleep 3
-	@echo "====================================="
-	@echo "start performance test with rp"
-	@echo "====================================="
-	@ab -n 10000 -c 10 http://127.0.0.1:18082/
-	@docker compose down
-	@pkill rp
-.PHONY: default test performance_test
+benchmark:
+	go test -bench . -run Benchmark
+
+.PHONY: default test benchmark
