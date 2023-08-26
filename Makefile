@@ -5,9 +5,9 @@ default: test
 ci: depsdev test
 
 test: cert
-	cp go.mod go_test.mod
-	go mod tidy -modfile=go_test.mod
-	go test ./... -modfile=go_test.mod -coverprofile=coverage.out -covermode=count
+	cp go.mod testdata/go_test.mod
+	go mod tidy -modfile=testdata/go_test.mod
+	go test ./... -modfile=testdata/go_test.mod -coverprofile=coverage.out -covermode=count
 
 lint:
 	golangci-lint run ./...
@@ -47,7 +47,7 @@ release:
 	git push origin main --tag
 
 benchmark:
-	go mod tidy -modfile=go_test.mod
-	go test -modfile=go_test.mod -bench . -run Benchmark
+	go mod tidy -modfile=testdata/go_test.mod
+	go test -modfile=testdata/go_test.mod -bench . -run Benchmark
 
 .PHONY: default test benchmark
