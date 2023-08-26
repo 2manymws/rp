@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.4.0](https://github.com/k1LoW/rp/compare/v0.3.0...v0.4.0) - 2023-08-26
+### Other Changes
+- Clean up go.mod by @k1LoW in https://github.com/k1LoW/rp/pull/11
+
 ## [v0.3.0](https://github.com/k1LoW/rp/compare/v0.2.0...v0.3.0) - 2023-08-26
 ### New Features 🎉
 - Add ListenAndServe and ListenAndServeTLS for convenience. by @k1LoW in https://github.com/k1LoW/rp/pull/10
