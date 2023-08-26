@@ -8,6 +8,8 @@ Prepare an instance that satisfies [`rp.Relayer`](https://pkg.go.dev/github.com/
 
 And then, create a new `http.Server` using [`rp.NewServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewServer) or [`rp.NewTLSServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewTLSServer) with the instance.
 
+Use [`rp.NewServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewServer) ( [`rp.ListenAndServe`](https://pkg.go.dev/github.com/k1LoW/rp#ListenAndServe) ) if handling per-domain (or per-request, as the case may be) upstreams.
+
 ```go
 package main
 
@@ -21,14 +23,12 @@ import (
 
 func main() {
     var r rp.Relayer = newMyRelayer()
-    if err := rp.ListenAndServe(":80", r); err != nil {
-        if !errors.Is(err, http.ErrServerClosed) {
-            log.Fatal(err)
-        }
-    }
+    log.Fatal(rp.ListenAndServe(":80", r))
 }
 ```
 
+Use [`rp.NewTLSServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewTLSServer) ( [`rp.ListenAndServeTLS`](https://pkg.go.dev/github.com/k1LoW/rp#ListenAndServeTLS) )if handling per-domain TLS termination as well as per-domain HTTP request routing.
+
 ```go
 package main
 
@@ -42,10 +42,6 @@ import (
 
 func main() {
     var r rp.Relayer = newMyRelayer()
-    if err := rp.ListenAndServeTLS(":443", r); err != nil {
-        if !errors.Is(err, http.ErrServerClosed) {
-            log.Fatal(err)
-        }
-    }
+    log.Fatal(rp.ListenAndServeTLS(":443", r))
 }
 ```
