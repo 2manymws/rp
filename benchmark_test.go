@@ -1,4 +1,4 @@
-package rp
+package rp_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/k1LoW/rp"
 	"github.com/k1LoW/rp/testutil"
 )
 
@@ -60,7 +61,7 @@ func BenchmarkRP(b *testing.B) {
 		upstreams[hostname] = u
 	}
 	r := testutil.NewRelayer(upstreams)
-	proxy := httptest.NewServer(NewRouter(r))
+	proxy := httptest.NewServer(rp.NewRouter(r))
 	defer proxy.Close()
 
 	b.ResetTimer()

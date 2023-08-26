@@ -1,4 +1,4 @@
-package rp
+package rp_test
 
 import (
 	"context"
@@ -13,10 +13,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/k1LoW/rp"
 	"github.com/k1LoW/rp/testutil"
 )
 
-var _ Relayer = &testutil.Relayer{}
+var _ rp.Relayer = &testutil.Relayer{}
 
 func TestHTTPRouting(t *testing.T) {
 	_, ba := testutil.NewServer(t, "a.example.com")
@@ -29,7 +30,7 @@ func TestHTTPRouting(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proxy := NewServer(fmt.Sprintf("127.0.0.1:%d", port), r)
+	proxy := rp.NewServer(fmt.Sprintf("127.0.0.1:%d", port), r)
 	go func() {
 		t.Helper()
 		if err := proxy.ListenAndServe(); err != nil {
@@ -100,7 +101,7 @@ func TestHTTPSRouting(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proxy := NewTLSServer(fmt.Sprintf("127.0.0.1:%d", port), r)
+	proxy := rp.NewTLSServer(fmt.Sprintf("127.0.0.1:%d", port), r)
 	go func() {
 		t.Helper()
 		if err := proxy.ListenAndServeTLS("", ""); err != nil {

@@ -5,7 +5,9 @@ default: test
 ci: depsdev test
 
 test: cert
-	go test ./... -coverprofile=coverage.out -covermode=count
+	cp go.mod go_test.mod
+	go mod tidy -modfile=go_test.mod
+	go test ./... -modfile=go_test.mod -coverprofile=coverage.out -covermode=count
 
 lint:
 	golangci-lint run ./...
@@ -30,7 +32,7 @@ depsdev:
 
 prerelease:
 	git pull origin main --tag
-	go mod tidy
+	go mod download
 	ghch -w -N ${VER}
 	gocredits -w .
 	git add CHANGELOG.md CREDITS go.mod go.sum
@@ -45,6 +47,7 @@ release:
 	git push origin main --tag
 
 benchmark:
-	go test -bench . -run Benchmark
+	go mod tidy -modfile=go_test.mod
+	go test -modfile=go_test.mod -bench . -run Benchmark
 
 .PHONY: default test benchmark
