@@ -23,8 +23,8 @@ func TestHTTPRouting(t *testing.T) {
 		"b.example.com": bb,
 	})
 
-	frontend := httptest.NewServer(NewRouter(r))
-	defer frontend.Close()
+	proxy := httptest.NewServer(NewRouter(r))
+	defer proxy.Close()
 	tests := []struct {
 		url            string
 		want           string
@@ -40,7 +40,7 @@ func TestHTTPRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(frontend.URL)
+			u, _ := url.Parse(proxy.URL)
 			req.URL.Host = u.Host
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
@@ -71,11 +71,11 @@ func TestHTTPSRouting(t *testing.T) {
 	})
 	tc := new(tls.Config)
 	tc.GetCertificate = r.GetCertificate
-	frontend := httptest.NewUnstartedServer(NewRouter(r))
-	frontend.TLS = tc
-	frontend.StartTLS()
-	frontend.TLS.Certificates = nil // Clear Certificates
-	defer frontend.Close()
+	proxy := httptest.NewUnstartedServer(NewRouter(r))
+	proxy.TLS = tc
+	proxy.StartTLS()
+	proxy.TLS.Certificates = nil // Clear Certificates
+	defer proxy.Close()
 	tests := []struct {
 		url            string
 		want           string
@@ -92,7 +92,7 @@ func TestHTTPSRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(frontend.URL)
+			u, _ := url.Parse(proxy.URL)
 			req.URL.Host = u.Host
 			certpool, err := x509.SystemCertPool()
 			if err != nil {
