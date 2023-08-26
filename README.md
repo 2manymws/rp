@@ -12,6 +12,7 @@ And then, create a new `http.Server` using [`rp.NewServer`](https://pkg.go.dev/g
 package main
 
 import (
+    "errors"
     "log"
     "net/http"
 
@@ -20,9 +21,33 @@ import (
 
 func main() {
     r := newMyRelayer()
-    s := rp.NewTLSServer(r)
-    if err := s.ListenAndServe(":443"); err != nil {
-        log.Fatal(err)
+    s := rp.NewServer(":80", r)
+    if err := s.ListenAndServe(); err != nil {
+        if !errors.Is(err, http.ErrServerClosed) {
+            log.Fatal(err)
+        }
+    }
+}
+```
+
+```go
+package main
+
+import (
+    "errors"
+    "log"
+    "net/http"
+
+    "github.com/k1LoW/rp"
+)
+
+func main() {
+    r := newMyRelayer()
+    s := rp.NewTLSServer(":443", r)
+    if err := s.ListenAndServeTLS("", ""); err != nil {
+        if !errors.Is(err, http.ErrServerClosed) {
+            log.Fatal(err)
+        }
     }
 }
 ```
