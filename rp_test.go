@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/k1LoW/rp/testutil"
 )
@@ -40,7 +41,18 @@ func TestHTTPRouting(t *testing.T) {
 	t.Cleanup(func() {
 		_ = proxy.Shutdown(context.Background())
 	})
-	proxyURL := fmt.Sprintf("http://127.0.0.1:%d", port)
+	proxyURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", port))
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := http.DefaultClient
+	for {
+		if _, err := client.Get(proxyURL.String()); err == nil {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
 	tests := []struct {
 		url            string
 		want           string
@@ -56,9 +68,8 @@ func TestHTTPRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(proxyURL)
-			req.URL.Host = u.Host
-			resp, err := http.DefaultClient.Do(req)
+			req.URL.Host = proxyURL.Host
+			resp, err := client.Do(req)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -101,7 +112,37 @@ func TestHTTPSRouting(t *testing.T) {
 	t.Cleanup(func() {
 		_ = proxy.Shutdown(context.Background())
 	})
-	proxyURL := fmt.Sprintf("https://127.0.0.1:%d", port)
+	proxyURL, err := url.Parse(fmt.Sprintf("https://127.0.0.1:%d", port))
+	if err != nil {
+		t.Fatal(err)
+	}
+	certpool, err := x509.SystemCertPool()
+	if err != nil {
+		// FIXME for Windows
+		// ref: https://github.com/golang/go/issues/18609
+		certpool = x509.NewCertPool()
+	}
+	cacert, err := os.ReadFile("testdata/cacert.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !certpool.AppendCertsFromPEM(cacert) {
+		t.Fatal("failed to add cacert")
+	}
+	client := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				ServerName: "a.example.com",
+				RootCAs:    certpool,
+			},
+		},
+	}
+	for {
+		if _, err := client.Get(proxyURL.String()); err == nil {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 	tests := []struct {
 		url            string
 		want           string
@@ -118,29 +159,9 @@ func TestHTTPSRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(proxyURL)
-			req.URL.Host = u.Host
-			certpool, err := x509.SystemCertPool()
-			if err != nil {
-				// FIXME for Windows
-				// ref: https://github.com/golang/go/issues/18609
-				certpool = x509.NewCertPool()
-			}
-			cacert, err := os.ReadFile("testdata/cacert.pem")
-			if err != nil {
-				t.Fatal(err)
-			}
-			if !certpool.AppendCertsFromPEM(cacert) {
-				t.Fatal("failed to add cacert")
-			}
-			client := http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						ServerName: req.Host, // Use SNI
-						RootCAs:    certpool,
-					},
-				},
-			}
+			req.URL.Host = proxyURL.Host
+			client.CloseIdleConnections()
+			client.Transport.(*http.Transport).TLSClientConfig.ServerName = req.Host // Use SNI
 			resp, err := client.Do(req)
 			if err != nil {
 				if !tt.wantErr {
@@ -152,7 +173,6 @@ func TestHTTPSRouting(t *testing.T) {
 				t.Error("want error")
 				return
 			}
-
 			defer resp.Body.Close()
 			b, err := io.ReadAll(resp.Body)
 			if err != nil {
