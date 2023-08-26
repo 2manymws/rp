@@ -22,21 +22,27 @@ func BenchmarkNGINX(b *testing.B) {
 	}
 	proxy := testutil.CreateReverseProxyServer(b, "r.example.com", upstreams)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		upstream := sample(upstreams)
-		req, err := http.NewRequest("GET", proxy, nil)
-		if err != nil {
-			b.Fatal(err)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			upstream := sample(upstreams)
+			req, err := http.NewRequest("GET", proxy, nil)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+			req.Host = upstream
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+			got := res.StatusCode
+			want := http.StatusOK
+			if res.StatusCode != http.StatusOK {
+				b.Errorf("got %v want %v", got, want)
+			}
 		}
-		req.Host = upstream
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			b.Fatal(err)
-		}
-		if res.StatusCode != http.StatusOK {
-			b.Fatal(res.Status)
-		}
-	}
+	})
 }
 
 func BenchmarkRP(b *testing.B) {
@@ -58,21 +64,27 @@ func BenchmarkRP(b *testing.B) {
 	defer proxy.Close()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		upstream := sample(upstreams)
-		req, err := http.NewRequest("GET", proxy.URL, nil)
-		if err != nil {
-			b.Fatal(err)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			upstream := sample(upstreams)
+			req, err := http.NewRequest("GET", proxy.URL, nil)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+			req.Host = upstream
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+			got := res.StatusCode
+			want := http.StatusOK
+			if res.StatusCode != http.StatusOK {
+				b.Errorf("got %v want %v", got, want)
+			}
 		}
-		req.Host = upstream
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			b.Fatal(err)
-		}
-		if res.StatusCode != http.StatusOK {
-			b.Fatal(res.Status)
-		}
-	}
+	})
 }
 
 func sample[T any](m map[string]T) string {
