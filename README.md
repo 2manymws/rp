@@ -20,9 +20,8 @@ import (
 )
 
 func main() {
-    r := newMyRelayer()
-    s := rp.NewServer(":80", r)
-    if err := s.ListenAndServe(); err != nil {
+    var r rp.Relayer = newMyRelayer()
+    if err := rp.ListenAndServe(":80", r); err != nil {
         if !errors.Is(err, http.ErrServerClosed) {
             log.Fatal(err)
         }
@@ -42,9 +41,8 @@ import (
 )
 
 func main() {
-    r := newMyRelayer()
-    s := rp.NewTLSServer(":443", r)
-    if err := s.ListenAndServeTLS("", ""); err != nil {
+    var r rp.Relayer = newMyRelayer()
+    if err := rp.ListenAndServeTLS(":443", r); err != nil {
         if !errors.Is(err, http.ErrServerClosed) {
             log.Fatal(err)
         }
