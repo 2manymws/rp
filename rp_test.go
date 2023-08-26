@@ -1,11 +1,13 @@
 package rp
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
@@ -22,9 +24,23 @@ func TestHTTPRouting(t *testing.T) {
 		"a.example.com": ba,
 		"b.example.com": bb,
 	})
-
-	proxy := httptest.NewServer(NewRouter(r))
-	defer proxy.Close()
+	port, err := testutil.NewPort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy := NewServer(fmt.Sprintf("127.0.0.1:%d", port), r)
+	go func() {
+		t.Helper()
+		if err := proxy.ListenAndServe(); err != nil {
+			if !errors.Is(err, http.ErrServerClosed) {
+				t.Error(err)
+			}
+		}
+	}()
+	t.Cleanup(func() {
+		_ = proxy.Shutdown(context.Background())
+	})
+	proxyURL := fmt.Sprintf("http://127.0.0.1:%d", port)
 	tests := []struct {
 		url            string
 		want           string
@@ -40,7 +56,7 @@ func TestHTTPRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(proxy.URL)
+			u, _ := url.Parse(proxyURL)
 			req.URL.Host = u.Host
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
@@ -69,13 +85,23 @@ func TestHTTPSRouting(t *testing.T) {
 		"a.example.com": ba,
 		"b.example.com": bb,
 	})
-	tc := new(tls.Config)
-	tc.GetCertificate = r.GetCertificate
-	proxy := httptest.NewUnstartedServer(NewRouter(r))
-	proxy.TLS = tc
-	proxy.StartTLS()
-	proxy.TLS.Certificates = nil // Clear Certificates
-	defer proxy.Close()
+	port, err := testutil.NewPort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy := NewTLSServer(fmt.Sprintf("127.0.0.1:%d", port), r)
+	go func() {
+		t.Helper()
+		if err := proxy.ListenAndServeTLS("", ""); err != nil {
+			if !errors.Is(err, http.ErrServerClosed) {
+				t.Error(err)
+			}
+		}
+	}()
+	t.Cleanup(func() {
+		_ = proxy.Shutdown(context.Background())
+	})
+	proxyURL := fmt.Sprintf("https://127.0.0.1:%d", port)
 	tests := []struct {
 		url            string
 		want           string
@@ -92,7 +118,7 @@ func TestHTTPSRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			u, _ := url.Parse(proxy.URL)
+			u, _ := url.Parse(proxyURL)
 			req.URL.Host = u.Host
 			certpool, err := x509.SystemCertPool()
 			if err != nil {
