@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.4.1](https://github.com/k1LoW/rp/compare/v0.4.0...v0.4.1) - 2023-08-27
+
 ## [v0.4.0](https://github.com/k1LoW/rp/compare/v0.3.0...v0.4.0) - 2023-08-26
 ### Other Changes
 - Clean up go.mod by @k1LoW in https://github.com/k1LoW/rp/pull/11
