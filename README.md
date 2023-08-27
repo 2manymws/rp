@@ -14,7 +14,6 @@ Use [`rp.NewServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewServer) ( [`rp.Li
 package main
 
 import (
-    "errors"
     "log"
     "net/http"
 
@@ -33,7 +32,6 @@ Use [`rp.NewTLSServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewTLSServer) ( [
 package main
 
 import (
-    "errors"
     "log"
     "net/http"
 
