@@ -4,28 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 )
 
-func NewServer(t *testing.T, h string) (*httptest.Server, *url.URL) {
+func NewUpstreamServer(t *testing.T, host string) *httptest.Server {
 	t.Helper()
-	u, err := url.Parse(fmt.Sprintf("http://%s", h))
-	if err != nil {
-		t.Fatal(err)
-	}
-	u.Scheme = "http"
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(fmt.Sprintf("/ of %s", h)))
+		_, _ = w.Write([]byte(fmt.Sprintf("response from %s [%s]", r.URL.String(), host)))
 	})
-	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(fmt.Sprintf("/hello of %s", h)))
-	})
-	s := httptest.NewServer(mux)
-	t.Cleanup(s.Close)
-	u.Host = s.Listener.Addr().String()
-	return s, u
+	ts := httptest.NewServer(h)
+	t.Cleanup(ts.Close)
+	return ts
 }

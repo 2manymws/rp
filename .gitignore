@@ -1,3 +1,5 @@
+.envrc
+.tmp/
 testdata/*.pem
 testdata/*.srl
 testdata/rp
