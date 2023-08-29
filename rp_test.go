@@ -166,6 +166,7 @@ func TestHTTPSRouting(t *testing.T) {
 						ServerName: "a.example.com",
 						RootCAs:    certpool,
 					},
+					ForceAttemptHTTP2: true,
 				},
 			}
 			for {
@@ -201,11 +202,13 @@ func TestHTTPSRouting(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := string(b)
-			if got != tt.want {
+			if got := string(b); got != tt.want {
 				t.Errorf("got %v\nwant %v", got, tt.want)
 			}
-			if resp.StatusCode != tt.wantStatusCode {
+			if got := resp.Proto; got != "HTTP/2.0" {
+				t.Errorf("got %v\nwant %v", got, "HTTP/2.0")
+			}
+			if got := resp.StatusCode; got != tt.wantStatusCode {
 				t.Errorf("got %v\nwant %v", resp.StatusCode, tt.wantStatusCode)
 			}
 		})
