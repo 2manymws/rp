@@ -7,13 +7,15 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path"
+	"strings"
 )
 
 type Relayer struct {
-	h map[string]*url.URL
+	h map[string]string
 }
 
-func NewRelayer(h map[string]*url.URL) *Relayer {
+func NewRelayer(h map[string]string) *Relayer {
 	return &Relayer{
 		h: h,
 	}
@@ -21,8 +23,15 @@ func NewRelayer(h map[string]*url.URL) *Relayer {
 
 func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	host := req.Host
-	if dest, ok := r.h[host]; ok {
-		return dest, nil
+	if upstream, ok := r.h[host]; ok {
+		uu, err := url.Parse(upstream)
+		if err != nil {
+			return nil, err
+		}
+		req.URL.Scheme = uu.Scheme
+		req.URL.Host = uu.Host
+		req.URL.Path = strings.ReplaceAll(path.Join(uu.Path, req.URL.Path), "//", "/")
+		return req.URL, nil
 	}
 	return nil, fmt.Errorf("not found upstream: %v", host)
 }

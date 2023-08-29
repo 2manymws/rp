@@ -20,7 +20,7 @@ const (
 //go:embed templates/*
 var conf embed.FS
 
-func CreateReverseProxyServer(t testing.TB, hostname string, upstreams map[string]string) string {
+func NewReverseProxyNGINXServer(t testing.TB, hostname string, upstreams map[string]string) string {
 	t.Helper()
 	dir := t.TempDir()
 	tb, err := conf.ReadFile("templates/nginx_reverse.conf.tmpl")
@@ -45,7 +45,7 @@ func CreateReverseProxyServer(t testing.TB, hostname string, upstreams map[strin
 	return createNGINXServer(t, hostname, p)
 }
 
-func CreateUpstreamEchoServer(t testing.TB, hostname string) string {
+func NewUpstreamEchoNGINXServer(t testing.TB, hostname string) string {
 	t.Helper()
 	dir := t.TempDir()
 	tb, err := conf.ReadFile("templates/nginx_echo.conf.tmpl")
@@ -92,10 +92,10 @@ func createNGINXServer(t testing.TB, hostname, conf string) string {
 		}
 	})
 
-	var host string
+	var urlstr string
 	if err := pool.Retry(func() error {
-		host = fmt.Sprintf("http://localhost:%s/", e.GetPort("80/tcp"))
-		u, err := url.Parse(host)
+		urlstr = fmt.Sprintf("http://localhost:%s/", e.GetPort("80/tcp"))
+		u, err := url.Parse(urlstr)
 		if err != nil {
 			return err
 		}
@@ -106,7 +106,7 @@ func createNGINXServer(t testing.TB, hostname, conf string) string {
 	}); err != nil {
 		t.Fatalf("Could not connect to database: %s", err)
 	}
-	return host
+	return urlstr
 }
 
 func testNetwork(t testing.TB) *dockertest.Network {
