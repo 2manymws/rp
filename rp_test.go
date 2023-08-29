@@ -21,7 +21,7 @@ var _ rp.Relayer = &testutil.Relayer{}
 
 type upstream struct {
 	hostname string
-	path     string
+	rootPath string
 }
 
 func TestHTTPRouting(t *testing.T) {
@@ -35,7 +35,8 @@ func TestHTTPRouting(t *testing.T) {
 		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://b.example.com/hello", "response from /hello [b.example.com]", http.StatusOK},
 		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://a.example.com/hello?foo=bar", "response from /hello?foo=bar [a.example.com]", http.StatusOK},
 		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://x.example.com/hello", "not found upstream: x.example.com", http.StatusBadGateway},
-		{[]upstream{{"a.example.com", "/A"}, {"b.example.com", "/B"}}, "http://a.example.com", "response from /A [a.example.com]", http.StatusOK},
+		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com", "response from /A [a.example.com]", http.StatusOK},
+		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com/hello?foo=bar", "response from /A/hello?foo=bar [a.example.com]", http.StatusOK},
 	}
 	for _, tt := range tests {
 		t.Run(tt.reqURL, func(t *testing.T) {
@@ -43,7 +44,7 @@ func TestHTTPRouting(t *testing.T) {
 			m := map[string]string{}
 			for _, u := range tt.upstreams {
 				us := testutil.NewUpstreamServer(t, u.hostname)
-				m[u.hostname] = us.URL + u.path
+				m[u.hostname] = us.URL + u.rootPath
 			}
 			r := testutil.NewRelayer(m)
 			port, err := testutil.NewPort()
@@ -123,7 +124,7 @@ func TestHTTPSRouting(t *testing.T) {
 			m := map[string]string{}
 			for _, u := range tt.upstreams {
 				us := testutil.NewUpstreamServer(t, u.hostname)
-				m[u.hostname] = us.URL + u.path
+				m[u.hostname] = us.URL + u.rootPath
 			}
 			r := testutil.NewRelayer(m)
 			port, err := testutil.NewPort()
