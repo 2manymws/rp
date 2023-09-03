@@ -49,7 +49,7 @@ release:
 
 benchmark: depsdev
 	go mod tidy -modfile=testdata/go_test.mod
-	go test -modfile=testdata/go_test.mod -bench . -run Benchmark | tee benchmark.out
+	go test -modfile=testdata/go_test.mod -bench . -benchmem -run Benchmark | tee benchmark.out
 	cat benchmark.out | octocov-go-test-bench > custom_metrics_bencmark.json
 
 .PHONY: default test benchmark
