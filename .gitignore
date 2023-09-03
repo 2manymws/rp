@@ -2,5 +2,6 @@
 .tmp/
 testdata/*.pem
 testdata/*.srl
-testdata/rp
 coverage.out
+benchmark.out
+custom_metrics_bencmark.json
