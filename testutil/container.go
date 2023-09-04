@@ -69,8 +69,17 @@ func NewUpstreamEchoNGINXServer(t testing.TB, hostname string) string {
 	return createNGINXServer(t, hostname, p)
 }
 
-func createNGINXServer(t testing.TB, hostname, conf string) string {
+func createNGINXServer(t testing.TB, hostname, confp string) string {
 	t.Helper()
+	dir := t.TempDir()
+	sb, err := conf.ReadFile("templates/sleep.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	sp := filepath.Join(dir, "sleep.js")
+	if err := os.WriteFile(sp, sb, 0644); err != nil {
+		t.Fatal(err)
+	}
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		t.Fatalf("Could not connect to docker: %s", err)
@@ -80,7 +89,10 @@ func createNGINXServer(t testing.TB, hostname, conf string) string {
 		Repository: "nginx",
 		Tag:        "latest",
 		Networks:   []*dockertest.Network{testNetwork(t)},
-		Mounts:     []string{fmt.Sprintf("%s:/etc/nginx/nginx.conf:ro", conf)},
+		Mounts: []string{
+			fmt.Sprintf("%s:/etc/nginx/nginx.conf:ro", confp),
+			fmt.Sprintf("%s:/etc/nginx/njs/sleep.js:ro", sp),
+		},
 	}
 	e, err := pool.RunWithOptions(opt)
 	if err != nil {
