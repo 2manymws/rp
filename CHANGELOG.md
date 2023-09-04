@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.4.2](https://github.com/k1LoW/rp/compare/v0.4.1...v0.4.2) - 2023-09-04
+### New Features 🎉
+- Enable ngx_http_js_module in upstream server by @k1LoW in https://github.com/k1LoW/rp/pull/19
+### Other Changes
+- Test using HTTP/2 by @k1LoW in https://github.com/k1LoW/rp/pull/16
+- Show benchmark in pull request using octocov by @k1LoW in https://github.com/k1LoW/rp/pull/17
+- Freeze benchtime by @k1LoW in https://github.com/k1LoW/rp/pull/18
+
 ## [v0.4.1](https://github.com/k1LoW/rp/compare/v0.4.0...v0.4.1) - 2023-08-27
 
 ## [v0.4.0](https://github.com/k1LoW/rp/compare/v0.3.0...v0.4.0) - 2023-08-26
