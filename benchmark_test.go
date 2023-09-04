@@ -57,7 +57,9 @@ func BenchmarkRP(b *testing.B) {
 	}
 	r := testutil.NewRelayer(upstreams)
 	proxy := httptest.NewServer(rp.NewRouter(r))
-	defer proxy.Close()
+	b.Cleanup(func() {
+		proxy.Close()
+	})
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
