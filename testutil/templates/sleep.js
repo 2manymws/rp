@@ -1,7 +1,7 @@
 const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
 async function hello(r) {
-    await sleep(3000);
+    await sleep(1000);
     r.return(200, "Hello world!");
 }
 

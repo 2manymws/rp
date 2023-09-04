@@ -1,5 +1,7 @@
 worker_processes 1;
 
+load_module /etc/nginx/modules/ngx_http_js_module.so;
+
 events {
     worker_connections 1024;
 }
@@ -15,7 +17,7 @@ http {
 
     server {
         listen 80;
-        location = /sleep {
+        location /sleep {
             js_content main.hello;
         }
 
