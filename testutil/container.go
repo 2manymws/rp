@@ -116,7 +116,7 @@ func createNGINXServer(t testing.TB, hostname, confp string) string {
 		}
 		return nil
 	}); err != nil {
-		t.Fatalf("Could not connect to database: %s", err)
+		t.Fatalf("Could not connect to NGINX server: %s", err)
 	}
 	return urlstr
 }
