@@ -4,7 +4,7 @@
 
 ## Usage
 
-Prepare an instance that satisfies [`rp.Relayer`](https://pkg.go.dev/github.com/k1LoW/rp#Relayer) interface.
+Prepare an instance that implements [`rp.Relayer`](https://pkg.go.dev/github.com/k1LoW/rp#Relayer) interface.
 
 And then, create a new `http.Server` using [`rp.NewServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewServer) or [`rp.NewTLSServer`](https://pkg.go.dev/github.com/k1LoW/rp#NewTLSServer) with the instance.
 
