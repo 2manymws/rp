@@ -1,10 +1,15 @@
 worker_processes 1;
 
+load_module /etc/nginx/modules/ngx_http_js_module.so;
+
 events {
     worker_connections 1024;
 }
 
 http {
+    js_path "/etc/nginx/njs/";
+    js_import main from sleep.js;
+
     include mime.types;
     default_type application/octet-stream;
     sendfile on;
@@ -12,6 +17,10 @@ http {
 
     server {
         listen 80;
+        location /sleep {
+            js_content main.hello;
+        }
+
         location / {
             return 200 "OK from {{ .Hostname }}!!";
         }

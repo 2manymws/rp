@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/k1LoW/rp"
 	"github.com/k1LoW/rp/testutil"
@@ -81,6 +82,29 @@ func BenchmarkRP(b *testing.B) {
 			}
 		}
 	})
+}
+
+func TestContainer(t *testing.T) {
+	_ = testutil.NewUpstreamEchoNGINXServer(t, "a.example.com")
+	upstreams := map[string]string{
+		"a.example.com": fmt.Sprintf("http://%s:80", "a.example.com"),
+	}
+	proxy := testutil.NewReverseProxyNGINXServer(t, "r.example.com", upstreams)
+	now := time.Now()
+	req, err := http.NewRequest("GET", proxy+"sleep", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Host = "a.example.com"
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	after := time.Now()
+	if after.Sub(now) < 1*time.Second {
+		t.Fatal("sleep.js is not working")
+	}
 }
 
 func sample[T any](m map[string]T) string {

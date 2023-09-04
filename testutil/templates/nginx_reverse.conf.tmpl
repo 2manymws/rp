@@ -9,11 +9,23 @@ http {
     sendfile on;
     keepalive_timeout 65;
 
+    proxy_cache_path /var/cache/nginx keys_zone=zone_one:1m max_size=10m;
+    proxy_temp_path  /tmp;
+
 {{ range $hostname, $pass := .Upstreams }}
     server {
         listen 80;
 
         server_name {{ $hostname }};
+        location /sleep {
+            proxy_cache zone_one;
+            proxy_pass {{ $pass }}/sleep;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
         location / {
             proxy_pass {{ $pass }};
             proxy_set_header Host $host;
