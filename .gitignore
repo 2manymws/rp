@@ -3,4 +3,4 @@
 testdata/*.pem
 testdata/*.srl
 coverage.out
-custom_metrics_bencmark.json
+custom_metrics_benchmark.json
