@@ -22,7 +22,7 @@ type Relayer interface {
 	// GetCertificate returns the TLS certificate for the given client hello info.
 	GetCertificate(*tls.ClientHelloInfo) (*tls.Certificate, error)
 	// RoundTrip performs the round trip of the request.
-	// It is necessary to implement the functions that http.Transport is responsible for (e.g. MacIdleConnsPerHost).
+	// It is necessary to implement the functions that http.Transport is responsible for (e.g. MaxIdleConnsPerHost).
 	RoundTrip(r *http.Request) (*http.Response, error)
 }
 
