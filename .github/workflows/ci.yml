@@ -21,11 +21,11 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Run go mod tidy for lint
+        run: go mod tidy
+
       - name: Run lint
         uses: reviewdog/action-golangci-lint@v2
-
-      - name: Run go mod tidy for gostyle
-        run: go mod tidy
 
       - name: Run gostyle
         uses: k1LoW/gostyle-action@reviewdog
