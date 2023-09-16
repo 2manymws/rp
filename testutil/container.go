@@ -104,7 +104,7 @@ func createNGINXServer(t testing.TB, hostname, confp string) string {
 		}
 	})
 
-	var urlstr string
+	var urlstr string //nostyle:repetition
 	if err := pool.Retry(func() error {
 		urlstr = fmt.Sprintf("http://localhost:%s/", e.GetPort("80/tcp"))
 		u, err := url.Parse(urlstr)
