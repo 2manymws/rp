@@ -16,15 +16,15 @@ func BenchmarkNGINX(b *testing.B) {
 		"b.example.com": "",
 		"c.example.com": "",
 	}
-	for hostname := range upstreams {
-		_ = testutil.NewUpstreamEchoNGINXServer(b, hostname)
-		upstreams[hostname] = fmt.Sprintf("http://%s:80", hostname)
+	for h := range upstreams {
+		_ = testutil.NewUpstreamEchoNGINXServer(b, h)
+		upstreams[h] = fmt.Sprintf("http://%s:80", h)
 	}
 	proxy := testutil.NewReverseProxyNGINXServer(b, "r.example.com", upstreams)
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			upstream := sample(upstreams)
+			upstream := sample(upstreams) //nostyle:repetition
 			req, err := http.NewRequest("GET", proxy, nil)
 			if err != nil {
 				b.Error(err)
@@ -45,15 +45,15 @@ func BenchmarkNGINX(b *testing.B) {
 	})
 }
 
-func BenchmarkRP(b *testing.B) {
+func BenchmarkRP(b *testing.B) { //nostyle:repetition
 	var upstreams = map[string]string{
 		"a.example.com": "",
 		"b.example.com": "",
 		"c.example.com": "",
 	}
-	for hostname := range upstreams {
-		urlstr := testutil.NewUpstreamEchoNGINXServer(b, hostname)
-		upstreams[hostname] = urlstr
+	for h := range upstreams {
+		urlstr := testutil.NewUpstreamEchoNGINXServer(b, h) //nostyle:repetition,varnames
+		upstreams[h] = urlstr
 	}
 	r := testutil.NewRelayer(upstreams)
 	proxy := httptest.NewServer(rp.NewRouter(r))
@@ -64,7 +64,7 @@ func BenchmarkRP(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			upstream := sample(upstreams)
+			upstream := sample(upstreams) //nostyle:repetition
 			req, err := http.NewRequest("GET", proxy.URL, nil)
 			if err != nil {
 				b.Error(err)

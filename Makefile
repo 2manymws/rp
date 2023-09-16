@@ -10,7 +10,11 @@ test: cert
 	go test ./... -modfile=testdata/go_test.mod -coverprofile=coverage.out -covermode=count
 
 lint:
+	go mod tidy
 	golangci-lint run ./...
+	-@go vet -vettool=`which gostyle` -gostyle.config=$(PWD)/.gostyle.yml ./...
+	rm -f go.sum
+	git restore go.*
 
 cert:
 	mkdir -p testdata

@@ -14,15 +14,23 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
 
+      - name: Run go mod tidy for lint
+        run: go mod tidy
+
       - name: Run lint
         uses: reviewdog/action-golangci-lint@v2
+
+      - name: Run gostyle
+        uses: k1LoW/gostyle-action@v1
+        with:
+          config-file: .gostyle.yml
 
       - name: Run tests
         run: make ci
