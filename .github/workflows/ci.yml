@@ -28,8 +28,9 @@ jobs:
         run: go mod tidy
 
       - name: Run gostyle
-        uses: k1LoW/gostyle-action@main
+        uses: k1LoW/gostyle-action@reviewdog
         with:
+          use-reviewdog: true
           config-file: .gostyle.yml
 
       - name: Run tests
