@@ -24,7 +24,7 @@ func BenchmarkNGINX(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			upstream := sample(upstreams) //nostyle:repetition
+			upstream := sample(upstreams)
 			req, err := http.NewRequest("GET", proxy, nil)
 			if err != nil {
 				b.Error(err)
@@ -52,7 +52,7 @@ func BenchmarkRP(b *testing.B) { //nostyle:repetition
 		"c.example.com": "",
 	}
 	for h := range upstreams {
-		urlstr := testutil.NewUpstreamEchoNGINXServer(b, h) //nostyle:repetition,varnames
+		urlstr := testutil.NewUpstreamEchoNGINXServer(b, h) //nostyle:varnames
 		upstreams[h] = urlstr
 	}
 	r := testutil.NewRelayer(upstreams)
@@ -64,7 +64,7 @@ func BenchmarkRP(b *testing.B) { //nostyle:repetition
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			upstream := sample(upstreams) //nostyle:repetition
+			upstream := sample(upstreams)
 			req, err := http.NewRequest("GET", proxy.URL, nil)
 			if err != nil {
 				b.Error(err)

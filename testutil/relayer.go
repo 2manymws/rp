@@ -21,9 +21,9 @@ func NewRelayer(h map[string]string) *Relayer {
 	}
 }
 
-func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) { //nostyle:getters
+func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	host := req.Host
-	if upstream, ok := r.h[host]; ok { //nostyle:repetition
+	if upstream, ok := r.h[host]; ok {
 		uu, err := url.Parse(upstream)
 		if err != nil {
 			return nil, err
@@ -41,7 +41,7 @@ func (r *Relayer) Rewrite(pr *httputil.ProxyRequest) error {
 	return nil
 }
 
-func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, error) { //nostyle:getters
+func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	cert := fmt.Sprintf("testdata/%s.cert.pem", i.ServerName)
 	key := fmt.Sprintf("testdata/%s.key.pem", i.ServerName)
 	if _, err := os.Stat(cert); err != nil {
