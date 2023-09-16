@@ -32,7 +32,7 @@ jobs:
         with:
           use-reviewdog: true
           config-file: .gostyle.yml
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Run tests
         run: make ci
