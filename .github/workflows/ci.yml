@@ -28,11 +28,9 @@ jobs:
         uses: reviewdog/action-golangci-lint@v2
 
       - name: Run gostyle
-        uses: k1LoW/gostyle-action@reviewdog
+        uses: k1LoW/gostyle-action@v1
         with:
-          use-reviewdog: true
           config-file: .gostyle.yml
-          fail-on-error: true
 
       - name: Run tests
         run: make ci
