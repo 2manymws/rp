@@ -18,8 +18,8 @@ func (r *myRelayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	u.Path = "/anything" + req.URL.Path
 	return u, nil
 }
+
 func (r *myRelayer) Rewrite(pr *httputil.ProxyRequest) error {
-	pr.Out.Host = "httpbin.org"
 	return nil
 }
 
