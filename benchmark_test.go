@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/k1LoW/rp"
-	"github.com/k1LoW/rp/testutil"
+	"github.com/k1LoW/rp/testdata/testutil"
 )
 
 func BenchmarkNGINX(b *testing.B) {
