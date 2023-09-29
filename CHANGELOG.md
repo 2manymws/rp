@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.4.4](https://github.com/k1LoW/rp/compare/v0.4.3...v0.4.4) - 2023-09-29
+### Fix bug 🐛
+- Should change pr.Out.Host by @k1LoW in https://github.com/k1LoW/rp/pull/24
+### Other Changes
+- Add gostyle-action by @k1LoW in https://github.com/k1LoW/rp/pull/23
+
 ## [v0.4.3](https://github.com/k1LoW/rp/compare/v0.4.2...v0.4.3) - 2023-09-04
 ### Fix bug 🐛
 - Fix cache setting of NGINX by @k1LoW in https://github.com/k1LoW/rp/pull/21
