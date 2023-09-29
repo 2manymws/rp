@@ -14,6 +14,7 @@ const errorKey = "X-Proxy-Error"
 // Relayer is the interface of the implementation that determines the behavior of the reverse proxy
 type Relayer interface {
 	// GetUpstream returns the upstream URL for the given request.
+	// If upstream is not determined, nil may be returned
 	// DO NOT modify the request in this method.
 	GetUpstream(*http.Request) (*url.URL, error)
 	// Rewrite rewrites the request before sending it to the upstream.
@@ -35,8 +36,10 @@ func NewRouter(r Relayer) http.Handler {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return
 			}
-			pr.Out.Host = u.Host
-			pr.Out.URL = u
+			if u != nil {
+				pr.Out.Host = u.Host
+				pr.Out.URL = u
+			}
 			if err := r.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return
