@@ -35,6 +35,7 @@ func NewRouter(r Relayer) http.Handler {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return
 			}
+			pr.Out.Host = u.Host
 			pr.Out.URL = u
 			if err := r.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
