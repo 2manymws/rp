@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"testing"
@@ -192,7 +193,8 @@ func TestHTTPSRouting(t *testing.T) {
 				return
 			}
 			if tt.wantErr {
-				t.Error("want error")
+				b, _ := httputil.DumpResponse(resp, true)
+				t.Errorf("want error, got resp:\n%s", string(b))
 				return
 			}
 			defer resp.Body.Close()
