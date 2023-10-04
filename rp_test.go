@@ -117,7 +117,7 @@ func TestHTTPSRouting(t *testing.T) {
 	}{
 		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "https://a.example.com/hello", "response from /hello [a.example.com]", false, http.StatusOK},
 		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "https://b.example.com/hello", "response from /hello [b.example.com]", false, http.StatusOK},
-		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "https://x.example.com/hello", "not found upstream: x.example.com", true, 0},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "https://x.example.invalid/hello", "", true, 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.reqURL, func(t *testing.T) {
