@@ -64,6 +64,22 @@ func newRelayer(r Relayer) *relayer {
 // NewRouter returns a new reverse proxy router.
 func NewRouter(r Relayer) http.Handler {
 	rr := newRelayer(r)
+	if rr.Rewrite == nil {
+		return &httputil.ReverseProxy{
+			Rewrite: func(pr *httputil.ProxyRequest) {
+				u, err := rr.GetUpstream(pr.In)
+				if err != nil {
+					pr.Out.Header.Set(errorKey, err.Error())
+					return
+				}
+				if u != nil {
+					pr.Out.Host = u.Host
+					pr.Out.URL = u
+				}
+			},
+			Transport: newTransport(rr),
+		}
+	}
 	return &httputil.ReverseProxy{
 		Rewrite: func(pr *httputil.ProxyRequest) {
 			u, err := rr.GetUpstream(pr.In)
@@ -74,9 +90,6 @@ func NewRouter(r Relayer) http.Handler {
 			if u != nil {
 				pr.Out.Host = u.Host
 				pr.Out.URL = u
-			}
-			if rr.Rewrite == nil {
-				return
 			}
 			if err := rr.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
