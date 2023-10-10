@@ -12,7 +12,7 @@ import (
 const errorKey = "X-Proxy-Error"
 
 // Relayer is the interface of the implementation that determines the behavior of the reverse proxy
-type Relayer interface {
+type Relayer interface { //nostyle:ifacenames
 	// GetUpstream returns the upstream URL for the given request.
 	// If upstream is not determined, nil may be returned
 	// DO NOT modify the request in this method.
@@ -25,7 +25,7 @@ type Rewriter interface {
 	Rewrite(*httputil.ProxyRequest) error
 }
 
-type CertGetter interface {
+type CertGetter interface { //nostyle:ifacenames
 	// GetCertificate returns the TLS certificate for the given client hello info.
 	GetCertificate(*tls.ClientHelloInfo) (*tls.Certificate, error)
 }
