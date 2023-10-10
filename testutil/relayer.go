@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
@@ -36,11 +35,6 @@ func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	return nil, fmt.Errorf("not found upstream: %v", host)
 }
 
-func (r *Relayer) Rewrite(pr *httputil.ProxyRequest) error {
-	pr.SetXForwarded()
-	return nil
-}
-
 func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	cert := fmt.Sprintf("testdata/%s.cert.pem", i.ServerName)
 	key := fmt.Sprintf("testdata/%s.key.pem", i.ServerName)
@@ -55,8 +49,4 @@ func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, erro
 		return nil, err
 	}
 	return &c, nil
-}
-
-func (r *Relayer) RoundTrip(req *http.Request) (*http.Response, error) {
-	return http.DefaultTransport.RoundTrip(req)
 }
