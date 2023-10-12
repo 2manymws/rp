@@ -55,7 +55,7 @@ func BenchmarkRP(b *testing.B) { //nostyle:repetition
 		urlstr := testutil.NewUpstreamEchoNGINXServer(b, h) //nostyle:varnames
 		upstreams[h] = urlstr
 	}
-	r := testutil.NewRelayer(upstreams)
+	r := testutil.NewSimpleRelayer(upstreams)
 	proxy := httptest.NewServer(rp.NewRouter(r))
 	b.Cleanup(func() {
 		proxy.Close()
