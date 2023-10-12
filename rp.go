@@ -75,6 +75,7 @@ func NewRouter(r Relayer) http.Handler {
 				if u != nil {
 					pr.Out.Host = u.Host
 					pr.Out.URL = u
+					pr.SetXForwarded()
 				}
 			},
 			Transport: newTransport(rr),
@@ -90,6 +91,7 @@ func NewRouter(r Relayer) http.Handler {
 			if u != nil {
 				pr.Out.Host = u.Host
 				pr.Out.URL = u
+
 			}
 			if err := rr.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
