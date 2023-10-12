@@ -36,11 +36,6 @@ func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	return nil, fmt.Errorf("not found upstream: %v", host)
 }
 
-func (r *Relayer) Rewrite(pr *httputil.ProxyRequest) error {
-	pr.SetXForwarded()
-	return nil
-}
-
 func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	cert := fmt.Sprintf("testdata/%s.cert.pem", i.ServerName)
 	key := fmt.Sprintf("testdata/%s.key.pem", i.ServerName)
@@ -57,6 +52,31 @@ func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, erro
 	return &c, nil
 }
 
-func (r *Relayer) RoundTrip(req *http.Request) (*http.Response, error) {
-	return http.DefaultTransport.RoundTrip(req)
+func (r *Relayer) Rewrite(*httputil.ProxyRequest) error {
+	return nil
+}
+
+type SimpleRelayer struct {
+	h map[string]string
+}
+
+func NewSimpleRelayer(h map[string]string) *SimpleRelayer {
+	return &SimpleRelayer{
+		h: h,
+	}
+}
+
+func (r *SimpleRelayer) GetUpstream(req *http.Request) (*url.URL, error) {
+	host := req.Host
+	if upstream, ok := r.h[host]; ok {
+		uu, err := url.Parse(upstream)
+		if err != nil {
+			return nil, err
+		}
+		req.URL.Scheme = uu.Scheme
+		req.URL.Host = uu.Host
+		req.URL.Path = strings.ReplaceAll(path.Join(uu.Path, req.URL.Path), "//", "/")
+		return req.URL, nil
+	}
+	return nil, fmt.Errorf("not found upstream: %v", host)
 }

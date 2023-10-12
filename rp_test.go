@@ -47,7 +47,7 @@ func TestHTTPRouting(t *testing.T) {
 				us := testutil.NewUpstreamServer(t, u.hostname)
 				m[u.hostname] = us.URL + u.rootPath
 			}
-			r := testutil.NewRelayer(m)
+			r := testutil.NewSimpleRelayer(m)
 			port, err := testutil.NewPort()
 			if err != nil {
 				t.Fatal(err)

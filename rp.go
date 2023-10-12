@@ -12,26 +12,77 @@ import (
 const errorKey = "X-Proxy-Error"
 
 // Relayer is the interface of the implementation that determines the behavior of the reverse proxy
-type Relayer interface {
+type Relayer interface { //nostyle:ifacenames
 	// GetUpstream returns the upstream URL for the given request.
 	// If upstream is not determined, nil may be returned
 	// DO NOT modify the request in this method.
 	GetUpstream(*http.Request) (*url.URL, error)
+}
+
+type Rewriter interface {
 	// Rewrite rewrites the request before sending it to the upstream.
 	// For example, you can set `X-Forwarded-*` header here using [httputil.ProxyRequest.SetXForwarded](https://pkg.go.dev/net/http/httputil#ProxyRequest.SetXForwarded)
 	Rewrite(*httputil.ProxyRequest) error
+}
+
+type CertGetter interface { //nostyle:ifacenames
 	// GetCertificate returns the TLS certificate for the given client hello info.
 	GetCertificate(*tls.ClientHelloInfo) (*tls.Certificate, error)
+}
+
+type RoundTripper interface {
 	// RoundTrip performs the round trip of the request.
 	// It is necessary to implement the functions that http.Transport is responsible for (e.g. MaxIdleConnsPerHost).
 	RoundTrip(r *http.Request) (*http.Response, error)
 }
 
+type relayer struct {
+	Relayer
+	Rewrite        func(*httputil.ProxyRequest) error
+	GetCertificate func(*tls.ClientHelloInfo) (*tls.Certificate, error)
+	RoundTrip      func(*http.Request) (*http.Response, error)
+}
+
+func newRelayer(r Relayer) *relayer {
+	rr := &relayer{
+		Relayer: r,
+	}
+	if v, ok := r.(Rewriter); ok {
+		rr.Rewrite = v.Rewrite
+	}
+	if v, ok := r.(CertGetter); ok {
+		rr.GetCertificate = v.GetCertificate
+	}
+	if v, ok := r.(RoundTripper); ok {
+		rr.RoundTrip = v.RoundTrip
+	} else {
+		rr.RoundTrip = http.DefaultTransport.RoundTrip
+	}
+	return rr
+}
+
 // NewRouter returns a new reverse proxy router.
 func NewRouter(r Relayer) http.Handler {
+	rr := newRelayer(r)
+	if rr.Rewrite == nil {
+		return &httputil.ReverseProxy{
+			Rewrite: func(pr *httputil.ProxyRequest) {
+				u, err := rr.GetUpstream(pr.In)
+				if err != nil {
+					pr.Out.Header.Set(errorKey, err.Error())
+					return
+				}
+				if u != nil {
+					pr.Out.Host = u.Host
+					pr.Out.URL = u
+				}
+			},
+			Transport: newTransport(rr),
+		}
+	}
 	return &httputil.ReverseProxy{
 		Rewrite: func(pr *httputil.ProxyRequest) {
-			u, err := r.GetUpstream(pr.In)
+			u, err := rr.GetUpstream(pr.In)
 			if err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return
@@ -40,12 +91,12 @@ func NewRouter(r Relayer) http.Handler {
 				pr.Out.Host = u.Host
 				pr.Out.URL = u
 			}
-			if err := r.Rewrite(pr); err != nil {
+			if err := rr.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
 				return
 			}
 		},
-		Transport: newTransport(r),
+		Transport: newTransport(rr),
 	}
 }
 
@@ -61,8 +112,11 @@ func NewServer(addr string, r Relayer) *http.Server {
 // NewTLSServer returns a new reverse proxy TLS server.
 func NewTLSServer(addr string, r Relayer) *http.Server {
 	rp := NewRouter(r)
+	rr := newRelayer(r)
 	tc := new(tls.Config)
-	tc.GetCertificate = r.GetCertificate
+	if rr.GetCertificate != nil {
+		tc.GetCertificate = rr.GetCertificate
+	}
 	return &http.Server{
 		Addr:      addr,
 		Handler:   rp,
@@ -83,7 +137,7 @@ func ListenAndServeTLS(addr string, r Relayer) error {
 }
 
 type transport struct {
-	r Relayer
+	rr *relayer
 }
 
 func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -103,9 +157,9 @@ func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 		}
 		return resp, nil
 	}
-	return t.r.RoundTrip(r)
+	return t.rr.RoundTrip(r)
 }
 
-func newTransport(r Relayer) *transport {
-	return &transport{r: r}
+func newTransport(rr *relayer) *transport {
+	return &transport{rr: rr}
 }
