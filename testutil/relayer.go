@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
@@ -49,4 +50,33 @@ func (r *Relayer) GetCertificate(i *tls.ClientHelloInfo) (*tls.Certificate, erro
 		return nil, err
 	}
 	return &c, nil
+}
+
+func (r *Relayer) Rewrite(*httputil.ProxyRequest) error {
+	return nil
+}
+
+type SimpleRelayer struct {
+	h map[string]string
+}
+
+func NewSimpleRelayer(h map[string]string) *SimpleRelayer {
+	return &SimpleRelayer{
+		h: h,
+	}
+}
+
+func (r *SimpleRelayer) GetUpstream(req *http.Request) (*url.URL, error) {
+	host := req.Host
+	if upstream, ok := r.h[host]; ok {
+		uu, err := url.Parse(upstream)
+		if err != nil {
+			return nil, err
+		}
+		req.URL.Scheme = uu.Scheme
+		req.URL.Host = uu.Host
+		req.URL.Path = strings.ReplaceAll(path.Join(uu.Path, req.URL.Path), "//", "/")
+		return req.URL, nil
+	}
+	return nil, fmt.Errorf("not found upstream: %v", host)
 }
