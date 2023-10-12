@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.5.0](https://github.com/k1LoW/rp/compare/v0.4.5...v0.5.0) - 2023-10-12
+### Breaking Changes 🛠
+- Minimize the number of methods that must be implemented. by @k1LoW in https://github.com/k1LoW/rp/pull/28
+- To act as a minimum reverse proxy with only the GetUpstream implementation, make it execute SetXForwarded(). by @k1LoW in https://github.com/k1LoW/rp/pull/29
+### Other Changes
+- Run 2 benchmarks on same runner by @k1LoW in https://github.com/k1LoW/rp/pull/26
+
 ## [v0.4.5](https://github.com/k1LoW/rp/compare/v0.4.4...v0.4.5) - 2023-09-29
 
 ## [v0.4.4](https://github.com/k1LoW/rp/compare/v0.4.3...v0.4.4) - 2023-09-29
