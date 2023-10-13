@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"text/template"
 
@@ -34,6 +35,7 @@ func NewReverseProxyNGINXServer(t testing.TB, hostname string, upstreams map[str
 		t.Fatal(err)
 	}
 	if err := tmpl.Execute(f, map[string]any{
+		"NumCPU":    runtime.NumCPU(),
 		"Hostname":  hostname,
 		"Upstreams": upstreams,
 	}); err != nil {
