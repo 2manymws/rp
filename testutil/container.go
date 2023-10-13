@@ -61,7 +61,6 @@ func NewUpstreamEchoNGINXServer(t testing.TB, hostname string) string {
 		t.Fatal(err)
 	}
 	if err := tmpl.Execute(f, map[string]any{
-		"NumCPU":   runtime.NumCPU(),
 		"Hostname": hostname,
 	}); err != nil {
 		t.Fatal(err)
