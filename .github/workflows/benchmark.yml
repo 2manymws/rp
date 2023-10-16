@@ -18,14 +18,14 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Set up deps
+        run: make depsdev
+
       - name: Check out source code (main)
         uses: actions/checkout@v4
         with:
           ref: main
           path: main
-
-      - name: Set up deps
-        run: make depsdev
 
       - name: Run benchmark (main)
         run: make benchmark
