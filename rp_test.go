@@ -26,18 +26,26 @@ type upstream struct {
 }
 
 func TestHTTPRouting(t *testing.T) {
+	simpleRelayer := func(m map[string]string) rp.Relayer {
+		return testutil.NewSimpleRelayer(m)
+	}
+	roundTripErrorRelayer := func(m map[string]string) rp.Relayer {
+		return testutil.NewRoundTripOnErrorRelayer(m)
+	}
 	tests := []struct {
 		upstreams      []upstream
 		reqURL         string
 		want           string
 		wantStatusCode int
+		setupRelayer   func(m map[string]string) rp.Relayer
 	}{
-		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://a.example.com", "response from / [a.example.com]", http.StatusOK},
-		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://b.example.com/hello", "response from /hello [b.example.com]", http.StatusOK},
-		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://a.example.com/hello?foo=bar", "response from /hello?foo=bar [a.example.com]", http.StatusOK},
-		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://x.example.com/hello", "not found upstream: x.example.com", http.StatusBadGateway},
-		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com", "response from /A [a.example.com]", http.StatusOK},
-		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com/hello?foo=bar", "response from /A/hello?foo=bar [a.example.com]", http.StatusOK},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://a.example.com", "response from / [a.example.com]", http.StatusOK, simpleRelayer},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://b.example.com/hello", "response from /hello [b.example.com]", http.StatusOK, simpleRelayer},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://a.example.com/hello?foo=bar", "response from /hello?foo=bar [a.example.com]", http.StatusOK, simpleRelayer},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://x.example.com/hello", "not found upstream: x.example.com", http.StatusBadGateway, simpleRelayer},
+		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com", "response from /A [a.example.com]", http.StatusOK, simpleRelayer},
+		{[]upstream{{"a.example.com", "/A"}}, "http://a.example.com/hello?foo=bar", "response from /A/hello?foo=bar [a.example.com]", http.StatusOK, simpleRelayer},
+		{[]upstream{{"a.example.com", "/"}, {"b.example.com", "/"}}, "http://x.example.com/hello", "round trip on error: x.example.com", http.StatusBadGateway, roundTripErrorRelayer},
 	}
 	for _, tt := range tests {
 		t.Run(tt.reqURL, func(t *testing.T) {
@@ -47,7 +55,7 @@ func TestHTTPRouting(t *testing.T) {
 				us := testutil.NewUpstreamServer(t, u.hostname)
 				m[u.hostname] = us.URL + u.rootPath
 			}
-			r := testutil.NewSimpleRelayer(m)
+			r := tt.setupRelayer(m)
 			port, err := testutil.NewPort()
 			if err != nil {
 				t.Fatal(err)

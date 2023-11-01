@@ -1,8 +1,10 @@
 package testutil
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -79,4 +81,30 @@ func (r *SimpleRelayer) GetUpstream(req *http.Request) (*url.URL, error) {
 		return req.URL, nil
 	}
 	return nil, fmt.Errorf("not found upstream: %v", host)
+}
+
+type RoundTripOnErrorRelayer struct {
+	SimpleRelayer
+}
+
+func NewRoundTripOnErrorRelayer(h map[string]string) *RoundTripOnErrorRelayer {
+	return &RoundTripOnErrorRelayer{
+		SimpleRelayer: SimpleRelayer{
+			h: h,
+		},
+	}
+}
+func (r *RoundTripOnErrorRelayer) RoundTripOnError(req *http.Request) (*http.Response, error) {
+	body := fmt.Sprintf("round trip on error: %v", req.Host)
+	return &http.Response{
+		Status:        http.StatusText(http.StatusBadGateway),
+		StatusCode:    http.StatusBadGateway,
+		Proto:         req.Proto,
+		ProtoMajor:    req.ProtoMajor,
+		ProtoMinor:    req.ProtoMinor,
+		Body:          io.NopCloser(bytes.NewBufferString(body)),
+		ContentLength: int64(len(body)),
+		Request:       req,
+		Header:        make(http.Header, 0),
+	}, nil
 }
