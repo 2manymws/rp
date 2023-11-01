@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.6.0](https://github.com/k1LoW/rp/compare/v0.5.0...v0.6.0) - 2023-11-01
+### New Features 🎉
+- Add a hook for errors occurring before the roundtrip. by @pyama86 in https://github.com/k1LoW/rp/pull/32
+### Other Changes
+- Set the number of CPUs to worker_processs by @k1LoW in https://github.com/k1LoW/rp/pull/30
+
 ## [v0.5.0](https://github.com/k1LoW/rp/compare/v0.4.5...v0.5.0) - 2023-10-12
 ### Breaking Changes 🛠
 - Minimize the number of methods that must be implemented. by @k1LoW in https://github.com/k1LoW/rp/pull/28
