@@ -34,13 +34,21 @@ type RoundTripper interface {
 	// RoundTrip performs the round trip of the request.
 	// It is necessary to implement the functions that http.Transport is responsible for (e.g. MaxIdleConnsPerHost).
 	RoundTrip(r *http.Request) (*http.Response, error)
+	RoundTripOnError(r *http.Request) (*http.Response, error)
+}
+
+type RoundTipperOnErrorer interface {
+	// RoundTripOnError performs the round trip of the request when the upstream returns an error.
+	// If this method is not implemented, the request will be sent to the default transport error.
+	RoundTripOnError(r *http.Request) (*http.Response, error)
 }
 
 type relayer struct {
 	Relayer
-	Rewrite        func(*httputil.ProxyRequest) error
-	GetCertificate func(*tls.ClientHelloInfo) (*tls.Certificate, error)
-	RoundTrip      func(*http.Request) (*http.Response, error)
+	Rewrite          func(*httputil.ProxyRequest) error
+	GetCertificate   func(*tls.ClientHelloInfo) (*tls.Certificate, error)
+	RoundTrip        func(*http.Request) (*http.Response, error)
+	RoundTripOnError func(*http.Request) (*http.Response, error)
 }
 
 func newRelayer(r Relayer) *relayer {
@@ -57,6 +65,9 @@ func newRelayer(r Relayer) *relayer {
 		rr.RoundTrip = v.RoundTrip
 	} else {
 		rr.RoundTrip = http.DefaultTransport.RoundTrip
+	}
+	if v, ok := r.(RoundTipperOnErrorer); ok {
+		rr.RoundTripOnError = v.RoundTripOnError
 	}
 	return rr
 }
@@ -144,6 +155,9 @@ type transport struct {
 
 func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	if v := r.Header.Get(errorKey); v != "" {
+		if t.rr.RoundTripOnError != nil {
+			return t.rr.RoundTripOnError(r)
+		}
 		// If errorKey is set, return error response.
 		body := v
 		resp := &http.Response{
