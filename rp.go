@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 const errorKey = "X-Proxy-Error"
@@ -73,7 +74,11 @@ func NewRouter(r Relayer) http.Handler {
 					return
 				}
 				if u != nil {
-					pr.Out.Host = u.Host
+					if strings.HasPrefix(u.Host, "/") {
+						pr.Out.Host = pr.In.Host
+					} else {
+						pr.Out.Host = u.Host
+					}
 					pr.Out.URL = u
 					pr.SetXForwarded()
 				}
@@ -89,9 +94,13 @@ func NewRouter(r Relayer) http.Handler {
 				return
 			}
 			if u != nil {
-				pr.Out.Host = u.Host
-				pr.Out.URL = u
+				if strings.HasPrefix(u.Host, "/") {
+					pr.Out.Host = pr.In.Host
+				} else {
+					pr.Out.Host = u.Host
+				}
 
+				pr.Out.URL = u
 			}
 			if err := rr.Rewrite(pr); err != nil {
 				pr.Out.Header.Set(errorKey, err.Error())
