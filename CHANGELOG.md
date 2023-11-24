@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.7.0](https://github.com/k1LoW/rp/compare/v0.6.0...v0.7.0) - 2023-11-24
+### New Features 🎉
+- Make it possible to proxy through a Unix domain socket. by @pyama86 in https://github.com/k1LoW/rp/pull/33
+
 ## [v0.6.0](https://github.com/k1LoW/rp/compare/v0.5.0...v0.6.0) - 2023-11-01
 ### New Features 🎉
 - Add a hook for errors occurring before the roundtrip. by @pyama86 in https://github.com/k1LoW/rp/pull/32
