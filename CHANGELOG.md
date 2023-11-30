@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.8.0](https://github.com/k1LoW/rp/compare/v0.7.0...v0.8.0) - 2023-11-30
+### New Features 🎉
+- support error handler by @pyama86 in https://github.com/k1LoW/rp/pull/35
+
 ## [v0.7.0](https://github.com/k1LoW/rp/compare/v0.6.0...v0.7.0) - 2023-11-24
 ### New Features 🎉
 - Make it possible to proxy through a Unix domain socket. by @pyama86 in https://github.com/k1LoW/rp/pull/33
