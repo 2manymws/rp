@@ -44,12 +44,18 @@ type RoundTipperOnErrorer interface {
 	RoundTripOnError(r *http.Request) (*http.Response, error)
 }
 
+type ErrorHandler interface {
+	// ErrorHandler handles the error returned by the upstream.
+	// If this method is not implemented, the error will be returned to the client.
+	ErrorHandler(http.ResponseWriter, *http.Request, error)
+}
 type relayer struct {
 	Relayer
 	Rewrite          func(*httputil.ProxyRequest) error
 	GetCertificate   func(*tls.ClientHelloInfo) (*tls.Certificate, error)
 	RoundTrip        func(*http.Request) (*http.Response, error)
 	RoundTripOnError func(*http.Request) (*http.Response, error)
+	ErrorHandler     func(http.ResponseWriter, *http.Request, error)
 }
 
 func newRelayer(r Relayer) *relayer {
@@ -69,6 +75,9 @@ func newRelayer(r Relayer) *relayer {
 	}
 	if v, ok := r.(RoundTipperOnErrorer); ok {
 		rr.RoundTripOnError = v.RoundTripOnError
+	}
+	if v, ok := r.(ErrorHandler); ok {
+		rr.ErrorHandler = v.ErrorHandler
 	}
 	return rr
 }
@@ -94,7 +103,8 @@ func NewRouter(r Relayer) http.Handler {
 					pr.SetXForwarded()
 				}
 			},
-			Transport: newTransport(rr),
+			Transport:    newTransport(rr),
+			ErrorHandler: rr.ErrorHandler,
 		}
 	}
 	return &httputil.ReverseProxy{
@@ -118,7 +128,8 @@ func NewRouter(r Relayer) http.Handler {
 				return
 			}
 		},
-		Transport: newTransport(rr),
+		Transport:    newTransport(rr),
+		ErrorHandler: rr.ErrorHandler,
 	}
 }
 
