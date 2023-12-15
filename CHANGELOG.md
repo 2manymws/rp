@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.8.2](https://github.com/2manymws/rp/compare/v0.8.1...v0.8.2) - 2023-12-15
+
 ## [v0.8.1](https://github.com/k1LoW/rp/compare/v0.8.0...v0.8.1) - 2023-12-15
 ### Fix bug 🐛
 - Don't touch req.URL by @k1LoW in https://github.com/k1LoW/rp/pull/38
