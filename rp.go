@@ -95,6 +95,7 @@ func NewRouter(r Relayer) http.Handler {
 				}
 				if u != nil {
 					if strings.HasPrefix(u.Host, "/") {
+						// Unix domain socket path
 						pr.Out.Host = pr.In.Host
 					} else {
 						pr.Out.Host = u.Host
@@ -116,6 +117,7 @@ func NewRouter(r Relayer) http.Handler {
 			}
 			if u != nil {
 				if strings.HasPrefix(u.Host, "/") {
+					// Unix domain socket path
 					pr.Out.Host = pr.In.Host
 				} else {
 					pr.Out.Host = u.Host
