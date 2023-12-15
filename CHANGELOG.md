@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.8.1](https://github.com/k1LoW/rp/compare/v0.8.0...v0.8.1) - 2023-12-15
+### Fix bug 🐛
+- Don't touch req.URL by @k1LoW in https://github.com/k1LoW/rp/pull/38
+
 ## [v0.8.0](https://github.com/k1LoW/rp/compare/v0.7.0...v0.8.0) - 2023-11-30
 ### New Features 🎉
 - support error handler by @pyama86 in https://github.com/k1LoW/rp/pull/35
