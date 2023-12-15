@@ -1,3 +1,3 @@
 module github.com/2manymws/rp
 
-go 1.21.0
+go 1.21.5
