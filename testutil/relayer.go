@@ -26,14 +26,18 @@ func NewRelayer(h map[string]string) *Relayer {
 func (r *Relayer) GetUpstream(req *http.Request) (*url.URL, error) {
 	host := req.Host
 	if upstream, ok := r.h[host]; ok {
+		ru, err := url.Parse(req.URL.String())
+		if err != nil {
+			return nil, err
+		}
 		uu, err := url.Parse(upstream)
 		if err != nil {
 			return nil, err
 		}
-		req.URL.Scheme = uu.Scheme
-		req.URL.Host = uu.Host
-		req.URL.Path = strings.ReplaceAll(path.Join(uu.Path, req.URL.Path), "//", "/")
-		return req.URL, nil
+		ru.Scheme = uu.Scheme
+		ru.Host = uu.Host
+		ru.Path = strings.ReplaceAll(path.Join(uu.Path, req.URL.Path), "//", "/")
+		return ru, nil
 	}
 	return nil, fmt.Errorf("not found upstream: %v", host)
 }
