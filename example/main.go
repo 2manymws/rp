@@ -7,7 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/k1LoW/rp"
+	"github.com/2manymws/rp"
 )
 
 type myRelayer struct {

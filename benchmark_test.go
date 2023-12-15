@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/k1LoW/rp"
-	"github.com/k1LoW/rp/testutil"
+	"github.com/2manymws/rp"
+	"github.com/2manymws/rp/testutil"
 )
 
 func BenchmarkNGINX(b *testing.B) {

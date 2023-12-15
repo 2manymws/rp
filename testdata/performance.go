@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/k1LoW/rp"
-	"github.com/k1LoW/rp/testutil"
+	"github.com/2manymws/rp"
+	"github.com/2manymws/rp/testutil"
 )
 
 func main() {

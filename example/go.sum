@@ -22,8 +22,8 @@ github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 h1:El6M4kTTCOh6aBiKaU
 github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3pAXIBCelhxNneeOaAeabZDe5s4K6zSpQ=
 github.com/imdario/mergo v0.3.12 h1:b6R2BslTbIEToALKP7LxUvijTsNI9TAe80pLWN2g/HU=
 github.com/imdario/mergo v0.3.12/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
-github.com/k1LoW/rp v0.4.3 h1:3oXz6eZEAm8/2FgEynpPZNxx8KbYeRcNmxYotFAEeRg=
-github.com/k1LoW/rp v0.4.3/go.mod h1:yIx02DG7bbtOFNy5us4BWCZ9q4n4u1YnNHo3YlYMQxk=
+github.com/2manymws/rp v0.4.3 h1:3oXz6eZEAm8/2FgEynpPZNxx8KbYeRcNmxYotFAEeRg=
+github.com/2manymws/rp v0.4.3/go.mod h1:yIx02DG7bbtOFNy5us4BWCZ9q4n4u1YnNHo3YlYMQxk=
 github.com/mitchellh/mapstructure v1.4.1 h1:CpVNEelQCZBooIPDn+AR3NpivK/TIKU8bDxdASFVQag=
 github.com/mitchellh/mapstructure v1.4.1/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 h1:rzf0wL0CHVc8CEsgyygG0Mn9CNCCPZqOPaz8RiiHYQk=

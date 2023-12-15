@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/k1LoW/rp"
-	"github.com/k1LoW/rp/testutil"
+	"github.com/2manymws/rp"
+	"github.com/2manymws/rp/testutil"
 )
 
 var _ rp.Relayer = &testutil.Relayer{}
