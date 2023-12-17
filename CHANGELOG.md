@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.8.4](https://github.com/2manymws/rp/compare/v0.8.3...v0.8.4) - 2023-12-17
+
 ## [v0.8.3](https://github.com/2manymws/rp/compare/v0.8.2...v0.8.3) - 2023-12-15
 
 ## [v0.8.2](https://github.com/2manymws/rp/compare/v0.8.1...v0.8.2) - 2023-12-15
