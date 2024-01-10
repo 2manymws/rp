@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path/filepath"
 	"strings"
 )
 
@@ -116,7 +117,7 @@ func NewRouter(r Relayer) http.Handler {
 				return
 			}
 			if u != nil {
-				if strings.HasPrefix(u.Host, "/") {
+				if filepath.IsAbs(u.Host) {
 					// Unix domain socket path
 					pr.Out.Host = pr.In.Host
 				} else {
